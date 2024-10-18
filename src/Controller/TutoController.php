@@ -10,8 +10,26 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class TutoController extends AbstractController
 {
+
+    #[Route('/tuto/{slug}', name: 'app_tuto_details')]
+    public function view(EntityManagerInterface $entityManager, string $slug): Response
+    {
+        $tuto = $entityManager->getRepository(Tuto::class)->findOneBySlug($slug);
+
+        // message erreur si aucun produit n'a ete trouve
+        if(!$tuto){
+            throw $this->createNotFoundException(
+                'Aucun produit n\' a été trouvé'
+            );
+        }
+
+
+        return $this->render('tuto/details.html.twig', [
+            'tuto' => $tuto  //affiche le produit recuperé
+        ]);
+    }
     //recup données depuis notre base de donnée
-    #[Route('/tuto:{id}', name: 'app_tuto')]
+    #[Route('/tuto/{id}', name: 'app_tuto')]
     public function index(EntityManagerInterface $entityManager, int $id): Response
     {
         $tuto = $entityManager->getRepository(Tuto::class)->find($id);
